@@ -7,6 +7,9 @@ The tank artwork is **intentionally fixed**: the card is built around one bundle
 ## Installation
 
 ### HACS
+[![Open your Home Assistant instance and open this repository in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=adityasanehi&repository=water-tank-card&category=plugin)
+
+Or add it manually:
 1. HACS → ⋮ → Custom repositories → add this repo as category **Dashboard**.
 2. Install **Water Tank Card** and reload the browser.
 
