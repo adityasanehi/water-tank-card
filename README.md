@@ -2,7 +2,9 @@
 
 A Home Assistant Lovelace card that shows a level sensor as an animated water tank.
 
-The tank artwork is **intentionally fixed**: the card is built around one bundled render, so it looks the same on every install. Custom backgrounds are supported. The tank render itself is not configurable (see [Using Your Own Tank Render](#using-your-own-tank-render)).
+![Tank at 20%, 60% and 90%](docs/levels.png)
+
+The tank artwork is **intentionally fixed**: the card is built around a bundled render (with or without the side pipe via `show_pipe`), so it looks the same on every install. Custom backgrounds are supported. The tank render itself is not configurable (see [Using Your Own Tank Render](#using-your-own-tank-render)).
 
 ## Installation
 
@@ -43,6 +45,10 @@ background_image: /local/terrace.jpg
 background_fit: cover
 background_position: center
 ```
+
+With `show_pipe: true` (left) and with `show_percentage: false` / `show_name: false` (right):
+
+![show_pipe and hidden labels](docs/variants.png)
 
 No background (the default): omit `background_image` and the tank sits on a transparent card.
 
