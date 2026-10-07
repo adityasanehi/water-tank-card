@@ -58,6 +58,7 @@ No background (the default): omit `background_image` and the tank sits on a tran
 | `background_position` | `center` | Any CSS background-position |
 | `show_percentage` / `show_name` | `true` | |
 | `show_pipe` | `false` | Use the tank render with the side pipe |
+| `vertical_margin` | `16` | Space above and below the tank, in px |
 | `animation` | `true` | Wave motion (also off with reduced-motion) |
 
 ## How percentage detection works

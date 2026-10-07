@@ -41,7 +41,7 @@ class WaterTankCard extends LitElement {
   setConfig(config) {
     if (!config?.entity) throw new Error('Please define an entity');
     this._config = {
-      show_percentage: true, show_name: true, animation: true, show_pipe: false,
+      show_percentage: true, show_name: true, animation: true, show_pipe: false, vertical_margin: 16,
       min: 0, max: 100, background_fit: 'cover', background_position: 'center',
       ...config,
     };
@@ -126,7 +126,7 @@ class WaterTankCard extends LitElement {
       ? `background-image:url("${c.background_image}");background-size:${FITS[c.background_fit] || 'cover'};background-position:${c.background_position}`
       : '';
     return html`<ha-card>
-      <div class="stage" style="aspect-ratio:${L.width}/${L.height};width:${L.span * 100}%;margin:0 auto">
+      <div class="stage" style="aspect-ratio:${L.width}/${L.height};width:${L.span * 100}%;margin:${Number(c.vertical_margin) || 0}px auto">
         ${bg ? html`<div class="bg" style=${bg}></div>` : nothing}
         <svg viewBox="0 0 ${L.width} ${L.height}" preserveAspectRatio="xMidYMid meet">
           <defs>
