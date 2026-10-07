@@ -1,6 +1,6 @@
 {
   "name": "water-tank-card",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Home Assistant Lovelace card with an animated water tank",
   "type": "module",
   "license": "MIT",
