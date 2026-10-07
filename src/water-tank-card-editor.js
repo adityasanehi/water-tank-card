@@ -18,13 +18,14 @@ const SCHEMA = [
     { name: 'show_percentage', type: 'boolean' },
     { name: 'show_name', type: 'boolean' },
     { name: 'animation', type: 'boolean' },
+    { name: 'show_pipe', type: 'boolean' },
   ] },
 ];
 const LABELS = {
   entity: 'Entity', name: 'Name', min: 'Min (non-% entities)', max: 'Max (non-% entities)',
   background_image: 'Background image URL (optional)', background_fit: 'Background fit',
   background_position: 'Background position', show_percentage: 'Show percentage',
-  show_name: 'Show name', animation: 'Animation',
+  show_name: 'Show name', animation: 'Animation', show_pipe: 'Show pipe',
 };
 
 class WaterTankCardEditor extends LitElement {
@@ -32,7 +33,7 @@ class WaterTankCardEditor extends LitElement {
   setConfig(config) { this._config = config; }
   render() {
     if (!this._config) return html``;
-    const data = { show_percentage: true, show_name: true, animation: true,
+    const data = { show_percentage: true, show_name: true, animation: true, show_pipe: false,
       background_fit: 'cover', background_position: 'center', ...this._config };
     return html`<ha-form .hass=${this.hass} .data=${data} .schema=${SCHEMA}
       .computeLabel=${(s) => LABELS[s.name] || s.name} @value-changed=${this._changed}></ha-form>`;

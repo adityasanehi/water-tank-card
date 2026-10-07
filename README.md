@@ -57,6 +57,7 @@ No background (the default): omit `background_image` and the tank sits on a tran
 | `background_fit` | `cover` | `cover`, `contain` or `fill` |
 | `background_position` | `center` | Any CSS background-position |
 | `show_percentage` / `show_name` | `true` | |
+| `show_pipe` | `false` | Use the tank render with the side pipe |
 | `animation` | `true` | Wave motion (also off with reduced-motion) |
 
 ## How percentage detection works
@@ -67,10 +68,10 @@ An entity is treated as a percentage if its `unit_of_measurement` is `%` or its 
 
 ## Using Your Own Tank Render
 
-The tank shell is not a Lovelace option. To use another render:
+The tank image is not a Lovelace option (other than `show_pipe`). To use another render:
 1. Fork this repository.
-2. Replace `assets/tank-shell.png` (a transparent PNG; the interior should be transparent so the water shows through).
-3. Edit `src/tank-layout.js`: set `width`/`height` to the image size, and `fill` (left/right/top/bottom/radius, in image pixels) to the area the water should occupy.
+2. Replace `assets/tank-only.png` (or `assets/tank-with-pipe.png` for the pipe variant) (a transparent PNG; the interior should be transparent so the water shows through).
+3. Edit the matching entry in `src/tank-layout.js`: set `width`/`height` to the image size, and `fill` (left/right/top/bottom/radius, in image pixels) to the area the water should occupy.
 4. Run `npm install && npm run build`, then use `dist/water-tank-card.js`.
 
 ## Development

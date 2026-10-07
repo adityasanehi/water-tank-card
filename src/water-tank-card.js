@@ -1,29 +1,27 @@
 import { LitElement, html, css, svg, nothing } from 'lit';
-import shellUrl from '../assets/tank-shell.png';
-import { tankLayout as L } from './tank-layout.js';
+import pipeUrl from '../assets/tank-with-pipe.png';
+import plainUrl from '../assets/tank-only.png';
+import { tankLayouts } from './tank-layout.js';
 import { computeLevel } from './level.js';
 import './water-tank-card-editor.js';
 
 const FITS = { cover: 'cover', contain: 'contain', fill: '100% 100%' };
-const F = L.fill;
-const H = F.bottom - F.top;
-const CX = (F.left + F.right) / 2;
 const STEP = 12;
 const AMP = 18; // max wave height in image px
 const BUBBLES = 7;
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 // Surface height offset at x: a few out-of-phase sines plus a slow slosh tilt.
-const surface = (x, t, p) =>
+const surface = (F, x, t, p) =>
   Math.sin(x * 0.011 * p.k + t * 1.5 * p.s + p.o) * 0.55 +
   Math.sin(x * 0.027 * p.k - t * 1.1 * p.s + p.o * 2) * 0.3 +
   Math.sin(x * 0.005 + t * 0.6 * p.s) * 0.45 +
-  ((x - CX) / (F.right - F.left)) * Math.sin(t * 0.55 * p.s + p.o) * 0.9;
+  ((x - (F.left + F.right) / 2) / (F.right - F.left)) * Math.sin(t * 0.55 * p.s + p.o) * 0.9;
 
-const pathAt = (y0, a, t, p, close = true) => {
+const pathAt = (F, y0, a, t, p, close = true) => {
   let d = '';
   for (let x = F.left - STEP; x <= F.right + STEP; x += STEP) {
-    d += `${d ? 'L' : 'M'}${x} ${(y0 + a * surface(x, t, p)).toFixed(1)}`;
+    d += `${d ? 'L' : 'M'}${x} ${(y0 + a * surface(F, x, t, p)).toFixed(1)}`;
   }
   return close ? `${d}L${F.right + STEP} ${F.bottom + 4}L${F.left - STEP} ${F.bottom + 4}Z` : d;
 };
@@ -43,7 +41,7 @@ class WaterTankCard extends LitElement {
   setConfig(config) {
     if (!config?.entity) throw new Error('Please define an entity');
     this._config = {
-      show_percentage: true, show_name: true, animation: true,
+      show_percentage: true, show_name: true, animation: true, show_pipe: false,
       min: 0, max: 100, background_fit: 'cover', background_position: 'center',
       ...config,
     };
@@ -65,8 +63,12 @@ class WaterTankCard extends LitElement {
     this._raf = requestAnimationFrame((ts) => this._frame(ts));
   }
 
+  get _layout() { return this._config.show_pipe ? tankLayouts.pipe : tankLayouts.plain; }
+
   _frame(ts) {
     this._raf = 0;
+    const F = this._layout.fill;
+    const H = F.bottom - F.top;
     const root = this.renderRoot;
     const back = root.querySelector('.back');
     if (!back) return;
@@ -84,9 +86,9 @@ class WaterTankCard extends LitElement {
     const y0 = F.bottom - (s / 100) * H;
     // waves flatten near empty and near full
     const a = AMP * Math.min(1, Math.min(s, 100 - s) / 12) * (live ? 1 : 0.35);
-    back.setAttribute('d', pathAt(y0 + 3, a * 0.8, this._t, BACK));
-    root.querySelector('.front').setAttribute('d', pathAt(y0, a, this._t, FRONT));
-    root.querySelector('.sheen').setAttribute('d', pathAt(y0, a, this._t, FRONT, false));
+    back.setAttribute('d', pathAt(F, y0 + 3, a * 0.8, this._t, BACK));
+    root.querySelector('.front').setAttribute('d', pathAt(F, y0, a, this._t, FRONT));
+    root.querySelector('.sheen').setAttribute('d', pathAt(F, y0, a, this._t, FRONT, false));
     root.querySelector('.water').style.opacity = level == null ? 0 : 1;
 
     const bubs = root.querySelectorAll('.bub');
@@ -113,6 +115,9 @@ class WaterTankCard extends LitElement {
   render() {
     const c = this._config;
     if (!c) return nothing;
+    const L = this._layout;
+    const F = L.fill;
+    const H = F.bottom - F.top;
     const stateObj = this.hass?.states?.[c.entity];
     const level = this._level;
     const name = c.name ?? stateObj?.attributes?.friendly_name ?? '';
@@ -121,7 +126,7 @@ class WaterTankCard extends LitElement {
       ? `background-image:url("${c.background_image}");background-size:${FITS[c.background_fit] || 'cover'};background-position:${c.background_position}`
       : '';
     return html`<ha-card>
-      <div class="stage" style="aspect-ratio:${L.width}/${L.height}">
+      <div class="stage" style="aspect-ratio:${L.width}/${L.height};width:${L.span * 100}%;margin:0 auto">
         ${bg ? html`<div class="bg" style=${bg}></div>` : nothing}
         <svg viewBox="0 0 ${L.width} ${L.height}" preserveAspectRatio="xMidYMid meet">
           <defs>
@@ -144,7 +149,7 @@ class WaterTankCard extends LitElement {
             ${Array.from({ length: BUBBLES }, () => svg`<circle class="bub" r="0" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="1.5"/>`)}
           </g></g>`}
         </svg>
-        <img class="shell" src=${shellUrl} alt="" />
+        <img class="shell" src=${c.show_pipe ? pipeUrl : plainUrl} alt="" />
         ${c.show_percentage || (c.show_name && name)
           ? html`<div class="ui" style="left:${((F.left + L.labelOffsetX) / L.width) * 100}%;width:${((F.right - F.left) / L.width) * 100}%;top:${(((F.top + F.bottom) / 2) / L.height) * 100}%">
               ${c.show_percentage ? html`<div class="pct">${text}</div>` : nothing}
@@ -156,7 +161,7 @@ class WaterTankCard extends LitElement {
 
   static styles = css`
     ha-card { overflow: hidden; background: transparent; box-shadow: none; border: none; }
-    .stage { position: relative; width: 100%; }
+    .stage { position: relative; }
     .bg, svg, .shell { position: absolute; inset: 0; width: 100%; height: 100%; }
     .bg { background-repeat: no-repeat; }
     .shell { object-fit: contain; pointer-events: none; }
